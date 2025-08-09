@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Hazan Mimarlık — Bienal</title>
 <meta name="color-scheme" content="dark" />
 <style>
@@ -15,40 +15,53 @@
     margin:0; color:var(--ink);
     font-family:"Yu Gothic UI","Yu Gothic",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
     overflow-x:hidden; background:#06070b;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
-  .animated-bg{ position:fixed; inset:0; z-index:-2;
-    background: radial-gradient(1200px 800px at 70% -10%, #101522 0%, #0c1120 45%, #06070b 80%),
-               linear-gradient(120deg, #0b1020, #060a12 60%, #05070c);
+
+  /* Animated navy gradient + noise (dokunmayı engellemesin) */
+  .animated-bg{
+    position:fixed; inset:0; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(1200px 800px at 70% -10%, #101522 0%, #0c1120 45%, #06070b 80%),
+      linear-gradient(120deg, #0b1020, #060a12 60%, #05070c);
     animation:bgShift 18s ease-in-out infinite alternate;
+    filter:saturate(1.05) contrast(1.02);
   }
   @keyframes bgShift{ from{background-position:0% 0%,0% 0%} to{background-position:25% 12%,60% 40%} }
-  .noise{ position:fixed; inset:-20%; z-index:-1; pointer-events:none; opacity:.085; mix-blend-mode:overlay;
-    background: repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 2px),
-                repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);
+  .noise{
+    position:fixed; inset:-20%; z-index:-1; pointer-events:none; opacity:.085; mix-blend-mode:overlay;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);
     animation:grain 2.8s steps(6,end) infinite; filter:blur(.25px);
   }
   @keyframes grain{ to{ transform:translate3d(-10px,6px,0) } }
 
-  .hero{ display:grid; place-items:center; text-align:center; height:min(70vh,700px); padding:48px 18px 24px; }
+  /* HERO */
+  .hero{
+    display:grid; place-items:center; text-align:center;
+    height:min(70svh,700px); /* mobil için svh */
+    padding:48px 18px 24px;
+  }
   .hero-logo{ width:100%; max-width:520px; height:auto; margin:0 auto 10px; filter:drop-shadow(0 10px 28px rgba(103,232,249,.25)); }
   .scroll-cue{ margin-top:8px; color:var(--muted); font-size:14px; }
   .scroll-cue .arrow{ animation:cue 1.8s ease-in-out infinite; display:inline-block; }
   @keyframes cue{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 
+  /* GALLERY (2 kart) */
   .wrap{ max-width:1200px; margin:24px auto 80px; padding:0 18px; }
   .tile{
     position:relative; overflow:hidden; border-radius:var(--radius);
     background:linear-gradient(160deg,#151b2a,#0b0f19 65%); box-shadow:var(--shadow); cursor:pointer;
-    height:45vh; display:flex; flex-direction:column; justify-content:flex-end;
+    height:45svh; display:flex; flex-direction:column; justify-content:flex-end;
   }
+  @media (max-width:600px){ .tile{ height:40svh; } }
   .tile img, .tile video{
     position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
     transition:transform .65s cubic-bezier(.2,.65,.2,1), filter .5s ease;
     z-index:0;
   }
-  .tile:hover img, .tile:hover video{
-    transform:scale(1.08); filter:saturate(1.05) contrast(1.07) brightness(1);
-  }
+  .tile:hover img, .tile:hover video{ transform:scale(1.06); filter:saturate(1.05) contrast(1.07) brightness(1) }
   .veil{
     position:absolute; inset:0;
     background:linear-gradient(180deg, rgba(8,10,14,.0), rgba(8,10,14,.38) 60%, rgba(8,10,14,.85));
@@ -56,33 +69,26 @@
   }
   .title-bar{
     position:relative; z-index:2;
-    padding:14px 16px; color:var(--ink); font-weight:700; font-size:1.2rem;
-    text-shadow:0 2px 8px rgba(0,0,0,.6);
-    background:rgba(0,0,0,.3); backdrop-filter:blur(4px);
+    padding:14px 16px; color:var(--ink); font-weight:700; font-size:1.1rem;
+    background:rgba(0,0,0,.32); backdrop-filter:blur(4px);
     border-top:1px solid rgba(255,255,255,.1);
-    transition:background .3s ease, color .3s ease;
-  }
-  .tile:hover .title-bar{
-    background:rgba(103,232,249,.15);
-    color:#67e8f9;
   }
 
-  /* Lightbox modal */
+  /* Lightbox (fix: başlangıçta kapalı) */
   .lightbox{
-    display:none; position:fixed; inset:0; z-index:1000;
+    position:fixed; inset:0; z-index:1000;
     background:rgba(0,0,0,0.65); backdrop-filter:blur(8px);
-    display:flex; align-items:center; justify-content:center;
+    display:none; align-items:center; justify-content:center;
   }
-  .lightbox-content{
-    max-width:90%; max-height:90%;
-    position:relative;
-  }
+  .lightbox.is-open{ display:flex; }
+  .lightbox-content{ max-width:90dvw; max-height:90dvh; position:relative; }
   .lightbox-content img, .lightbox-content video{
     max-width:100%; max-height:100%; border-radius:var(--radius); box-shadow:var(--shadow);
   }
   .lightbox-close{
     position:absolute; top:-40px; right:0;
     background:none; border:none; color:white; font-size:32px; cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 </style>
 </head>
@@ -94,14 +100,15 @@
     <div class="scroll-cue"><span class="arrow">↓</span> Aşağı kaydırın</div>
   </section>
 
-  <main class="wrap">
+  <main class="wrap" aria-label="Bienal Eserleri">
     <div class="tile" data-type="video" data-src="media/isik-senaryosu.mp4">
-      <video src="media/isik-senaryosu.mp4" autoplay muted loop playsinline></video>
+      <video src="media/isik-senaryosu.mp4" autoplay muted playsinline webkit-playsinline loop preload="metadata"></video>
       <span class="veil"></span>
       <div class="title-bar">Işık Senaryosu — Site-specific Enstalasyon</div>
     </div>
+
     <div class="tile" data-type="image" data-src="media/organik-struktur.jpg">
-      <img src="media/organik-struktur.jpg" alt="">
+      <img src="media/organik-struktur.jpg" alt="Organik Strüktür" loading="lazy">
       <span class="veil"></span>
       <div class="title-bar">Organik Strüktür — Elastik Yüzey Enstalasyonu</div>
     </div>
@@ -110,7 +117,7 @@
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
     <div class="lightbox-content" id="lightbox-content">
-      <button class="lightbox-close" id="lightbox-close">&times;</button>
+      <button class="lightbox-close" id="lightbox-close" aria-label="Kapat">&times;</button>
     </div>
   </div>
 
@@ -118,34 +125,50 @@
     const tiles = document.querySelectorAll('.tile');
     const lightbox = document.getElementById('lightbox');
     const lightboxContent = document.getElementById('lightbox-content');
-    const lightboxClose = document.getElementById('lightbox-close');
+    const closeBtn = document.getElementById('lightbox-close');
+    const body = document.body;
+
+    function openLightbox(type, src){
+      // içerik temizle
+      lightboxContent.querySelectorAll('img,video').forEach(e=>e.remove());
+      // medya ekle
+      if(type === 'video'){
+        const vid = document.createElement('video');
+        vid.src = src;
+        vid.controls = true;
+        vid.autoplay = true;
+        vid.muted = false; // kullanıcı etkileşimi ile açıldığı için ses serbest
+        vid.playsInline = true;
+        vid.setAttribute('webkit-playsinline','');
+        lightboxContent.insertBefore(vid, closeBtn);
+      }else{
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        lightboxContent.insertBefore(img, closeBtn);
+      }
+      lightbox.classList.add('is-open');
+      // body scroll kilidi (mobilde titreme engeli)
+      body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(){
+      lightbox.classList.remove('is-open');
+      body.style.overflow = '';
+      // mobilde video sesini durdur
+      const v = lightboxContent.querySelector('video');
+      if(v){ v.pause(); }
+    }
 
     tiles.forEach(tile=>{
-      tile.addEventListener('click',()=>{
-        const type = tile.dataset.type;
-        const src = tile.dataset.src;
-        lightboxContent.querySelectorAll('img,video').forEach(e=>e.remove());
-
-        if(type === 'video'){
-          const vid = document.createElement('video');
-          vid.src = src;
-          vid.controls = true;
-          vid.autoplay = true;
-          vid.style.borderRadius = 'var(--radius)';
-          lightboxContent.insertBefore(vid, lightboxClose);
-        } else {
-          const img = document.createElement('img');
-          img.src = src;
-          lightboxContent.insertBefore(img, lightboxClose);
-        }
-        lightbox.style.display = 'flex';
-      });
+      const open = ()=> openLightbox(tile.dataset.type, tile.dataset.src);
+      tile.addEventListener('click', open, {passive:true});
+      tile.addEventListener('touchend', open, {passive:true});
     });
 
-    lightboxClose.addEventListener('click',()=> lightbox.style.display='none');
-    lightbox.addEventListener('click', e=>{
-      if(e.target === lightbox) lightbox.style.display='none';
-    });
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e=>{ if(e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeLightbox(); });
   </script>
 </body>
 </html>
